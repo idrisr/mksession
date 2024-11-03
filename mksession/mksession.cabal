@@ -1,0 +1,25 @@
+cabal-version: 3.0
+name:          mksession
+version:       0.1.0.0
+license:       MIT
+build-type:    Simple
+
+common warnings
+  ghc-options:        -Wall
+  default-language:   Haskell2010
+  default-extensions:
+    NoStarIsType
+    QuasiQuotes
+
+executable mksession
+  import:         warnings
+  main-is:        Main.hs
+  build-depends:
+    , base                  ^>=4.18.2.1
+    , filepath
+    , neat-interpolation
+    , optparse-applicative
+    , text
+    , turtle
+
+  hs-source-dirs: app
