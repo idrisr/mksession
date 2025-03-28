@@ -6,6 +6,7 @@ import NeatInterpolation
 import Options.Applicative
 import System.FilePath
 import Turtle hiding (header)
+import Prelude hiding (writeFile)
 
 opts :: ParserInfo ()
 opts =
@@ -21,10 +22,10 @@ newtype Directory = Directory Text
 newtype Session = Session Text
 
 main :: IO ()
-main = execParser opts >> sh thing
+main = execParser opts >> sh writeFile
 
-thing :: Shell ()
-thing = do
+writeFile :: Shell ()
+writeFile = do
     dir <- pwd
     output (dir </> "session.yaml") $ select . toList . textToLines $ mkSession (dirName dir) (sessionName dir)
 
