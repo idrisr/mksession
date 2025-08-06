@@ -14,8 +14,8 @@
       in
       {
         packages.default = mksession;
-
         checks.default = mksession;
+        overlays = final: prev: { mksession = final.haskell.packages.${compiler}.callPackage ./default.nix { }; };
 
         devShells.default = pkgs.mkShell {
           LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [ pkgs.zlib ];
