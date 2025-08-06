@@ -1,60 +1,37 @@
 {
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/24.05";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
     flake-utils.url = "github:numtide/flake-utils";
-    pre-commit-hooks.url = "github:cachix/pre-commit-hooks.nix";
-    devenv.url = "github:cachix/devenv";
   };
 
-  outputs = inputs@{ self, nixpkgs, flake-utils, ... }:
-    let
-      pkgs = nixpkgs.legacyPackages.${system};
-      hooks = {
-        nixfmt.enable = true;
-        deadnix.enable = true;
-        beautysh.enable = true;
-        # fourmolu.enable = true; how to get these haskell packages as a
-        # function of the compiler set?
-        # cabal-fmt.enable = true;
-        # how to get unit tests added for haskell?
-      };
+  outputs = { nixpkgs, flake-utils, ... }:
+    flake-utils.lib.eachDefaultSystem (system:
+      let
+        pkgs = nixpkgs.legacyPackages.${system};
+        compiler = "ghc984";
 
-      system = flake-utils.lib.system.x86_64-linux;
-      compiler = "ghc965";
-      hPkgs = pkgs.haskell.packages."${compiler}";
-      dTools = with pkgs; [ zlib ];
-      hTools = with hPkgs; [
-        ghc
-        ghcid
-        fourmolu
-        hlint
-        hoogle
-        haskell-language-server
-        implicit-hie
-        retrie
-        cabal-install
-        cabal-fmt
-      ];
-      tools = dTools ++ hTools;
-      mksession =
-        pkgs.haskell.packages.${compiler}.callCabal2nix "" ./mksession { };
+        mksession = pkgs.haskell.packages.${compiler}.callPackage ./default.nix { };
+      in
+      {
+        packages.default = mksession;
 
-    in {
-      devShells.${system}.default = nixpkgs.legacyPackages.${system}.mkShell {
-        inherit (self.checks.${system}.pre-commit-check) shellHook;
-        buildInputs = self.checks.${system}.pre-commit-check.enabledPackages
-          ++ tools;
-        LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath tools;
-      };
+        checks.default = mksession;
 
-      packages.${system}.default = mksession;
-
-      checks.${system} = {
-        pre-commit-check = inputs.pre-commit-hooks.lib.${system}.run {
-          src = ./.;
-          inherit hooks;
+        devShells.default = pkgs.mkShell {
+          LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [ pkgs.zlib ];
+          buildInputs = with pkgs.haskell.packages.${compiler}; [
+            ghc
+            cabal-install
+            ghcid
+            fourmolu
+            cabal-fmt
+            implicit-hie
+            cabal2nix
+            pkgs.ghciwatch
+            pkgs.haskell-language-server
+            pkgs.zlib
+            pkgs.colordiff
+          ];
         };
-        inherit mksession;
-      };
-    };
+      });
 }
