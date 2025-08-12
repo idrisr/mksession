@@ -7,6 +7,7 @@ module MkSession where
 import Data.Aeson.TH (deriveToJSON)
 import GHC.Generics (Generic)
 import MkSessionUtils
+import System.FilePath (takeBaseName)
 
 data Session = Session
     { session_name :: String
@@ -42,7 +43,7 @@ deriveToJSON (opts False) ''Session
 defaultSession :: FilePath -> Session
 defaultSession fp =
     Session
-        { session_name = fp
+        { session_name = takeBaseName fp
         , windows =
             [ Window
                 { window_name = "haskell"
