@@ -61,5 +61,12 @@ defaultSession fp =
                 , shell_command_before = Just ["cd " ++ fp ++ " && git status"]
                 , options = Nothing
                 }
+            , Window
+                { window_name = "agent"
+                , layout = "tiled"
+                , panes = Nothing
+                , shell_command_before = Just ["cd " ++ fp ++ " && git status"]
+                , options = Nothing
+                }
             ]
         }
