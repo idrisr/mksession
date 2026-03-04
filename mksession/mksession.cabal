@@ -10,19 +10,20 @@ common warnings
   default-extensions:
     NoStarIsType
     QuasiQuotes
+  build-depends:
+    base
+    , aeson
+    , directory
+    , filepath
+    , optparse-applicative
+    , yaml
 
 executable mksession
   import:         warnings
   main-is:        Main.hs
   hs-source-dirs: app
   build-depends:
-    , aeson
-    , base                  ^>=4.19.0.0
-    , directory
-    , filepath
     , mksession
-    , optparse-applicative
-    , yaml
 
 library
   import:           warnings
@@ -33,12 +34,8 @@ library
 
   build-depends:
     , aeson
-    , base                  ^>=4.19.0.0
     , bytestring
-    , directory
-    , filepath
     , neat-interpolation
-    , optparse-applicative
     , text
     , yaml
 

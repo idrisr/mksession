@@ -1,16 +1,16 @@
 {
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
   outputs = { nixpkgs, flake-utils, ... }:
-    flake-utils.lib.eachDefaultSystem
+    flake-utils.lib.eachSystem
+      [ "x86_64-linux" "aarch64-darwin" ]
       (system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
-          compiler = "ghc984";
-          mksession = pkgs.haskell.packages.${compiler}.callPackage ./default.nix { };
+          mksession = pkgs.haskellPackages.callPackage ./default.nix { };
         in
         {
           packages.default = mksession;
@@ -18,7 +18,7 @@
 
           devShells.default = pkgs.mkShell {
             LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [ pkgs.zlib ];
-            buildInputs = with pkgs.haskell.packages.${compiler}; [
+            buildInputs = with pkgs.haskellPackages; [
               ghc
               cabal-install
               ghcid
